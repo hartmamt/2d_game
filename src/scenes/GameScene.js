@@ -129,18 +129,37 @@ export default class GameScene extends Phaser.Scene {
   setupSocketEvents() {
     this.socket.on('gameJoined', (data) => {
       this.playerId = data.playerId;
+
+      // Create player immediately
+      const characterStats = {
+        scavenger: { maxHealth: 100, speed: 200, damage: 15, attackSpeed: 0.2 },
+        forgeguard: { maxHealth: 200, speed: 100, damage: 40, attackSpeed: 0.8 },
+        riftrunner: { maxHealth: 75, speed: 250, damage: 25, attackSpeed: 0.3 }
+      };
+
+      const stats = characterStats[this.characterClass] || characterStats.scavenger;
+      const playerData = {
+        id: this.playerId,
+        name: this.playerName,
+        class: this.characterClass,
+        x: 1000,
+        y: 1000,
+        health: stats.maxHealth,
+        maxHealth: stats.maxHealth,
+        speed: stats.speed,
+        damage: stats.damage,
+        attackSpeed: stats.attackSpeed
+      };
+
+      this.player = new Player(this, playerData.x, playerData.y, playerData);
+      this.playerGroup.add(this.player);
+      this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     });
 
     this.socket.on('gameState', (state) => {
-      // Update players
+      // Update other players
       state.players.forEach(playerData => {
-        if (playerData.id === this.playerId) {
-          if (!this.player) {
-            this.player = new Player(this, playerData.x, playerData.y, playerData);
-            this.playerGroup.add(this.player);
-            this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-          }
-        } else {
+        if (playerData.id !== this.playerId) {
           if (!this.players.has(playerData.id)) {
             const otherPlayer = new Player(this, playerData.x, playerData.y, playerData);
             this.players.set(playerData.id, otherPlayer);
@@ -359,6 +378,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   spawnEnemyWave() {
+    if (!this.player) return;
+
     const waveSize = 3 + Math.floor(this.currentZone * 1.5);
 
     for (let i = 0; i < waveSize; i++) {
