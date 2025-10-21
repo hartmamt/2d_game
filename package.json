@@ -1,0 +1,28 @@
+{
+  "name": "ashen-core",
+  "version": "1.0.0",
+  "description": "Ashen Core - 4-player online survival roguelike",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server/index.js",
+    "client": "vite",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "preview": "vite preview"
+  },
+  "keywords": ["game", "multiplayer", "roguelike"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1",
+    "phaser": "^3.60.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.2"
+  }
+}
